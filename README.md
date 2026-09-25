@@ -9,6 +9,8 @@ LLM judges, and see exactly which cases got better or worse.
 Eval Harness answers that question at the level where it matters: per test case, per
 evaluator, per slice of the dataset, alongside latency, token usage, and estimated cost.
 
+![Run comparison dashboard: the candidate's overall score rises 36 points, but a warning notes that Correctness fell, and slicing by Correctness flags the easy, operations, and people slices as regressed](docs/screenshots/run-comparison.png)
+
 ---
 
 ## Contents
@@ -112,15 +114,21 @@ uvicorn app.main:app --reload --port 8000
 
 1. **Suites** → *Research QA*. The overview shows the best variant in the latest run and its
    delta against the baseline.
+
+   ![Suites overview listing the Research QA and Structured Extraction suites with their latest run, best score, and delta against the baseline](docs/screenshots/suites.png)
+
 2. **Dataset**: browse, filter by tag, edit a case, or import `docs/examples/support-answers.json`.
 3. **Variants** and **Evaluators**: inspect or edit prompts, models, rubrics, and thresholds.
 4. **Run evaluation**: choose variants, evaluators, and optionally tags; watch progress live.
 5. **Run results**: pick a reference and a candidate. Try *Grounded + cited · prompt v2*
    against the baseline: the overall score rises by 36 points, but the verdict warns that
-   **Correctness fell**, and slicing by *Correctness* shows the `people` and `operations`
-   slices regressed.
+   **Correctness fell**, and slicing by *Correctness* shows the `easy`, `operations`, and
+   `people` slices regressed.
 6. Click **Regressed**, open a case, and read the judge's reasons side by side. Use `j` / `k`
    to move through the filtered cases.
+
+   ![Case inspector for the regressed norrland-fleet case: input and reference answer, both outputs side by side, and the Correctness judge's score and reason for each](docs/screenshots/case-inspector.png)
+
 7. **Set as baseline** on a run to make it the reference for future runs.
 
 ## Environment variables
