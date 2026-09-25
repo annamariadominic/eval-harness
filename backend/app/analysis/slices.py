@@ -36,11 +36,19 @@ def _tags_of(case: CaseRecord) -> tuple[str, ...]:
     return case.tags or (UNTAGGED,)
 
 
-def _score(cases: Sequence[CaseRecord]) -> tuple[float | None, float | None]:
+def _score(
+    cases: Sequence[CaseRecord], evaluator_key: str | None
+) -> tuple[float | None, float | None]:
     scored = [c for c in cases if c.succeeded]
+    if evaluator_key is None:
+        return (
+            mean(s for c in scored if (s := c.score) is not None),
+            mean(1.0 if p else 0.0 for c in scored if (p := c.passed) is not None),
+        )
+    records = [r for c in scored if (r := c.score_for(evaluator_key)) is not None and r.usable]
     return (
-        mean(s for c in scored if (s := c.score) is not None),
-        mean(1.0 if p else 0.0 for c in scored if (p := c.passed) is not None),
+        mean(r.score for r in records if r.score is not None),
+        mean(1.0 if r.passed else 0.0 for r in records if r.passed is not None),
     )
 
 
@@ -51,23 +59,31 @@ def compute_slices(
     *,
     overall_delta: float | None = None,
     slice_threshold: float = DEFAULT_SLICE_THRESHOLD,
+    evaluator_key: str | None = None,
 ) -> list[SliceRow]:
-    """``target_cases`` and ``base_cases`` should already be restricted to shared cases."""
+    """``target_cases`` and ``base_cases`` should already be restricted to shared cases.
+
+    With ``evaluator_key``, slices use that evaluator's scores instead of case scores (and
+    ``overall_delta`` should be that evaluator's overall delta), so a regression in one quality
+    dimension is not masked by gains in another.
+    """
     tags = sorted({t for c in target_cases for t in _tags_of(c)}, key=lambda t: (t == UNTAGGED, t))
     comparison_by_case = {c.test_case_id: c for c in comparisons}
     rows: list[SliceRow] = []
     for tag in tags:
         target_slice = [c for c in target_cases if tag in _tags_of(c)]
         base_slice = [c for c in base_cases or () if tag in _tags_of(c)]
-        target_score, target_pass = _score(target_slice)
-        base_score, base_pass = _score(base_slice) if base_cases is not None else (None, None)
+        target_score, target_pass = _score(target_slice, evaluator_key)
+        base_score, base_pass = (
+            _score(base_slice, evaluator_key) if base_cases is not None else (None, None)
+        )
         delta = (
             target_score - base_score
             if target_score is not None and base_score is not None
             else None
         )
         changes = [
-            comparison_by_case[c.test_case_id].change
+            _change_for(comparison_by_case[c.test_case_id], evaluator_key)
             for c in target_slice
             if c.test_case_id in comparison_by_case
         ]
@@ -90,3 +106,10 @@ def compute_slices(
             )
         )
     return rows
+
+
+def _change_for(comparison: CaseComparison, evaluator_key: str | None) -> Change:
+    if evaluator_key is None:
+        return comparison.change
+    delta = next((d for d in comparison.evaluators if d.evaluator_key == evaluator_key), None)
+    return delta.change if delta else Change.INCOMPARABLE

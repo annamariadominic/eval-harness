@@ -48,3 +48,30 @@ def test_failed_generations_do_not_count_toward_slice_scores() -> None:
     )
     assert rows[0].target_score == 1.0
     assert rows[0].cases == 2
+
+
+def test_slicing_on_one_evaluator_reveals_a_masked_regression() -> None:
+    # Citations improve everywhere, masking a correctness drop on "people" cases.
+    base = [
+        case("p1", score("correct", 1.0), score("cite", 0.0), tags=("people",)),
+        case("f1", score("correct", 1.0), score("cite", 0.0), tags=("financial",)),
+    ]
+    target = [
+        case("p1", score("correct", 0.5), score("cite", 1.0), tags=("people",)),
+        case("f1", score("correct", 1.0), score("cite", 1.0), tags=("financial",)),
+    ]
+    comparisons = [compare_case(b, t) for b, t in zip(base, target, strict=True)]
+    by_case = {r.tag: r for r in compute_slices(target, base, comparisons, overall_delta=0.25)}
+    assert by_case["people"].delta == pytest.approx(0.25)  # masked by citation gains
+
+    by_correctness = {
+        r.tag: r
+        for r in compute_slices(
+            target, base, comparisons, overall_delta=-0.25, evaluator_key="correct"
+        )
+    }
+    assert by_correctness["people"].delta == pytest.approx(-0.5)
+    assert by_correctness["people"].regressed == 1
+    assert by_correctness["people"].regressed_slice
+    assert not by_correctness["people"].hidden_regression  # overall correctness also fell
+    assert by_correctness["financial"].delta == pytest.approx(0.0)

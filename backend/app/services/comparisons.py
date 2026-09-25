@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.analysis.comparison import compare_case, count_changes, pair_cases
-from app.analysis.metrics import aggregate_arm
+from app.analysis.metrics import ArmMetrics, aggregate_arm
 from app.analysis.slices import DEFAULT_SLICE_THRESHOLD, compute_slices
 from app.db.models import EvaluatorScore, Result, Run, RunCase, RunVariant
 from app.evaluators.registry import EVALUATOR_TYPES
@@ -81,6 +81,7 @@ async def build_comparison(
     target_id: str,
     base_id: str | None = None,
     slice_threshold: float = DEFAULT_SLICE_THRESHOLD,
+    slice_evaluator: str | None = None,
 ) -> ComparisonReport:
     target = await _load_arm(session, target_id)
     target_records = await load_arm_records(session, target.id)
@@ -101,9 +102,11 @@ async def build_comparison(
                 for c in target_records
             ],
             slices=[
-                SliceRowOut.model_validate(asdict(row)) for row in compute_slices(target_records)
+                SliceRowOut.model_validate(asdict(row))
+                for row in compute_slices(target_records, evaluator_key=slice_evaluator)
             ],
             slice_threshold=slice_threshold,
+            slice_evaluator=slice_evaluator,
         )
 
     base = await _load_arm(session, base_id)
@@ -122,12 +125,16 @@ async def build_comparison(
         if target_metrics.overall_score is not None and base_metrics.overall_score is not None
         else None
     )
+    slice_overall_delta = overall_delta
+    if slice_evaluator is not None:
+        slice_overall_delta = _evaluator_delta(base_metrics, target_metrics, slice_evaluator)
     slices = compute_slices(
         shared_target,
         shared_base,
         comparisons,
-        overall_delta=overall_delta,
+        overall_delta=slice_overall_delta,
         slice_threshold=slice_threshold,
+        evaluator_key=slice_evaluator,
     )
     return ComparisonReport(
         base=arm_ref(base),
@@ -145,7 +152,16 @@ async def build_comparison(
         cases=[CaseComparisonOut.model_validate(asdict(c)) for c in comparisons],
         slices=[SliceRowOut.model_validate(asdict(row)) for row in slices],
         slice_threshold=slice_threshold,
+        slice_evaluator=slice_evaluator,
     )
+
+
+def _evaluator_delta(base: ArmMetrics, target: ArmMetrics, key: str) -> float | None:
+    base_mean = next((e.mean_score for e in base.evaluators if e.evaluator_key == key), None)
+    target_mean = next((e.mean_score for e in target.evaluators if e.evaluator_key == key), None)
+    if base_mean is None or target_mean is None:
+        return None
+    return target_mean - base_mean
 
 
 async def get_case_results(
