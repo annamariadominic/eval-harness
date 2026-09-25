@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. Light is the default; dark applies via prefers-color-scheme unless the user
+ * picked a theme explicitly (data-theme on <html>).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --ink: #15171c;
+  --muted: #5a616e;
+  --faint: #8b929f;
+  --line: #e1e4e9;
+  --line-strong: #cdd2d9;
+  --accent: #2f4bd8;
+  --accent-ink: #ffffff;
+  --accent-soft: #e8ecfd;
+  --good: #0c7a5b;
+  --good-soft: #e1f3ec;
+  --bad: #b3361a;
+  --bad-soft: #fbe8e2;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --neutral-bar: #c9ced6;
+  color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+:root[data-theme="dark"] {
+  --bg: #0e1117;
+  --surface: #151922;
+  --surface-2: #1b202b;
+  --ink: #e6e9ef;
+  --muted: #9ba3b1;
+  --faint: #6c7483;
+  --line: #262c38;
+  --line-strong: #343b4a;
+  --accent: #8197ff;
+  --accent-ink: #0e1117;
+  --accent-soft: #1e2542;
+  --good: #3cc398;
+  --good-soft: #13302a;
+  --bad: #ff8b69;
+  --bad-soft: #3a1f19;
+  --warn: #e8b04a;
+  --warn-soft: #33280f;
+  --neutral-bar: #3a4252;
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #0e1117;
+    --surface: #151922;
+    --surface-2: #1b202b;
+    --ink: #e6e9ef;
+    --muted: #9ba3b1;
+    --faint: #6c7483;
+    --line: #262c38;
+    --line-strong: #343b4a;
+    --accent: #8197ff;
+    --accent-ink: #0e1117;
+    --accent-soft: #1e2542;
+    --good: #3cc398;
+    --good-soft: #13302a;
+    --bad: #ff8b69;
+    --bad-soft: #3a1f19;
+    --warn: #e8b04a;
+    --warn-soft: #33280f;
+    --neutral-bar: #3a4252;
+    color-scheme: dark;
   }
 }
 
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-neutral-bar: var(--neutral-bar);
+  --font-sans: var(--font-plex-sans);
+  --font-mono: var(--font-plex-mono);
+}
+
+html {
+  background: var(--bg);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-plex-sans), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Numbers line up in tables and deltas. */
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
 }
