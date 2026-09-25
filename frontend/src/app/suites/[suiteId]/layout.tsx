@@ -1,7 +1,7 @@
 "use client";
 
 import { Play } from "lucide-react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { ButtonLink } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import { useSuite } from "@/lib/api/hooks";
 export default function SuiteLayout({ children }: { children: ReactNode }) {
   const { suiteId } = useParams<{ suiteId: string }>();
   const { data: suite, error } = useSuite(suiteId);
+  const pathname = usePathname();
   const base = `/suites/${suiteId}`;
 
   if (error) return <ErrorNotice error={error} />;
@@ -25,9 +26,11 @@ export default function SuiteLayout({ children }: { children: ReactNode }) {
         title={suite.name}
         description={suite.description}
         actions={
-          <ButtonLink href={`${base}/runs/new`} variant="primary" icon={<Play size={13} />}>
-            Run evaluation
-          </ButtonLink>
+          !pathname.endsWith("/runs/new") && (
+            <ButtonLink href={`${base}/runs/new`} variant="primary" icon={<Play size={13} />}>
+              Run evaluation
+            </ButtonLink>
+          )
         }
       />
       <div className="mb-6">
