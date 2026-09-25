@@ -80,6 +80,7 @@ class RunOut(ApiModel):
     case_count: int
     progress: RunProgress
     is_baseline: bool
+    baseline_run_variant_id: str | None
     variants: list[RunVariantOut]
     evaluators: list[RunEvaluatorOut]
     summary: dict[str, Any] | None
