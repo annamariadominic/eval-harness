@@ -91,3 +91,14 @@ class ModelProvider(Protocol):
     name: str
 
     async def generate(self, messages: list[Message], config: ModelConfig) -> GenerationResult: ...
+
+
+def classify_http_status(status_code: int) -> ErrorKind:
+    """Map an upstream HTTP status to an error kind (shared by the HTTP-based adapters)."""
+    if status_code in (401, 403):
+        return "auth"
+    if status_code == 429:
+        return "rate_limited"
+    if status_code in (408, 409) or status_code >= 500:
+        return "server_error"
+    return "bad_request"
