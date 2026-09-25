@@ -14,6 +14,7 @@ def settings(tmp_path: Path) -> Settings:
     return Settings(
         EVAL_HARNESS_DATABASE_URL=f"sqlite+aiosqlite:///{tmp_path / 'test.db'}",
         EVAL_HARNESS_SEED_EXAMPLES=False,
+        EVAL_HARNESS_MOCK_LATENCY_SCALE=0,
         OPENAI_API_KEY=None,
         ANTHROPIC_API_KEY=None,
         _env_file=None,
