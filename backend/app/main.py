@@ -7,11 +7,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_error_handlers
-from app.api.routes import evaluators, health, meta, suites, test_cases, variants
+from app.api.routes import evaluators, health, meta, runs, suites, test_cases, variants
 from app.config import Settings, get_settings
 from app.db.session import Database
 from app.pricing import PricingTable
 from app.providers.registry import ProviderRegistry
+from app.runner.executor import RunExecutor
+from app.runner.manager import RunManager
 
 API_PREFIX = "/api"
 
@@ -27,9 +29,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.settings = settings
         app.state.providers = ProviderRegistry.from_settings(settings)
         app.state.pricing = PricingTable.from_file(settings.resolved_pricing_file())
+        executor = RunExecutor(db.sessionmaker, app.state.providers, app.state.pricing)
+        app.state.run_manager = RunManager(db.sessionmaker, executor)
+        await app.state.run_manager.recover_interrupted()
         try:
             yield
         finally:
+            await app.state.run_manager.shutdown()
             await db.dispose()
 
     app = FastAPI(
@@ -52,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         test_cases.router,
         variants.router,
         evaluators.router,
+        runs.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app
