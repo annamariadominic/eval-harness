@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db.models import Evaluator, Run, Suite, TestCase, Variant
+from app.domain.statuses import RunStatus
 from app.schemas.suites import (
     ArmScore,
     LatestRun,
@@ -17,6 +18,7 @@ from app.schemas.suites import (
     SuiteUpdate,
 )
 from app.services.common import get_or_404
+from app.services.errors import InvalidRequestError, NotFoundError
 
 
 async def create_suite(session: AsyncSession, data: SuiteCreate) -> Suite:
@@ -135,3 +137,35 @@ def best_arm(run: Run) -> ArmScore | None:
     if not scored:
         return None
     return max(scored, key=lambda a: a.overall_score or 0.0)
+
+
+async def set_baseline(
+    session: AsyncSession, suite_id: str, run_id: str, run_variant_id: str | None
+) -> Suite:
+    suite = await get_or_404(session, Suite, suite_id)
+    run = await session.scalar(
+        select(Run).where(Run.id == run_id).options(selectinload(Run.variants))
+    )
+    if run is None or run.suite_id != suite_id:
+        raise NotFoundError(f"Run '{run_id}' does not belong to this suite")
+    if run.status != RunStatus.COMPLETED:
+        raise InvalidRequestError("Only completed runs can be used as a baseline")
+    if run_variant_id is None:
+        if len(run.variants) != 1:
+            raise InvalidRequestError(
+                "This run evaluated several variants; choose which one is the baseline"
+            )
+        run_variant_id = run.variants[0].id
+    elif run_variant_id not in {v.id for v in run.variants}:
+        raise InvalidRequestError(f"Variant '{run_variant_id}' is not part of run '{run_id}'")
+    suite.baseline_run_id = run.id
+    suite.baseline_run_variant_id = run_variant_id
+    await session.commit()
+    return suite
+
+
+async def clear_baseline(session: AsyncSession, suite_id: str) -> None:
+    suite = await get_or_404(session, Suite, suite_id)
+    suite.baseline_run_id = None
+    suite.baseline_run_variant_id = None
+    await session.commit()

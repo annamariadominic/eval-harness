@@ -268,6 +268,9 @@ def _to_out(run: Run, progress: RunProgress, case_count: int) -> dict[str, Any]:
         "case_count": case_count,
         "progress": progress,
         "is_baseline": run.suite.baseline_run_id == run.id,
+        "baseline_run_variant_id": (
+            run.suite.baseline_run_variant_id if run.suite.baseline_run_id == run.id else None
+        ),
         "variants": [RunVariantOut.model_validate(v) for v in run.variants],
         "evaluators": [RunEvaluatorOut.model_validate(e) for e in run.evaluators],
         "summary": run.summary,
