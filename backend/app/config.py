@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     # Execution defaults applied when a run does not override them.
     default_concurrency: int = Field(default=4, validation_alias="EVAL_HARNESS_DEFAULT_CONCURRENCY")
     max_concurrency: int = Field(default=32, validation_alias="EVAL_HARNESS_MAX_CONCURRENCY")
+    mock_latency_scale: float = Field(
+        default=1.0, validation_alias="EVAL_HARNESS_MOCK_LATENCY_SCALE"
+    )
     request_timeout_s: float = Field(default=60.0, validation_alias="EVAL_HARNESS_REQUEST_TIMEOUT")
 
     def resolved_pricing_file(self) -> Path:
