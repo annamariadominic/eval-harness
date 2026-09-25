@@ -7,9 +7,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_error_handlers
-from app.api.routes import health
+from app.api.routes import evaluators, health, meta, suites, test_cases, variants
 from app.config import Settings, get_settings
 from app.db.session import Database
+from app.pricing import PricingTable
+from app.providers.registry import ProviderRegistry
 
 API_PREFIX = "/api"
 
@@ -23,6 +25,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         await db.create_all()
         app.state.db = db
         app.state.settings = settings
+        app.state.providers = ProviderRegistry.from_settings(settings)
+        app.state.pricing = PricingTable.from_file(settings.resolved_pricing_file())
         try:
             yield
         finally:
@@ -41,7 +45,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     register_error_handlers(app)
-    app.include_router(health.router, prefix=API_PREFIX)
+    for router in (
+        health.router,
+        meta.router,
+        suites.router,
+        test_cases.router,
+        variants.router,
+        evaluators.router,
+    ):
+        app.include_router(router, prefix=API_PREFIX)
     return app
 
 

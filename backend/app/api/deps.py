@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.db.session import Database
+from app.providers.registry import ProviderRegistry
 
 
 def get_database(request: Request) -> Database:
@@ -29,3 +30,11 @@ async def get_session(
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 SettingsDep = Annotated[Settings, Depends(get_settings_dep)]
+
+
+def get_registry(request: Request) -> ProviderRegistry:
+    registry: ProviderRegistry = request.app.state.providers
+    return registry
+
+
+RegistryDep = Annotated[ProviderRegistry, Depends(get_registry)]
