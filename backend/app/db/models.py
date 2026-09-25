@@ -261,9 +261,7 @@ class EvaluatorScore(Base):
     __tablename__ = "evaluator_scores"
 
     id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: new_id("score"))
-    result_id: Mapped[str] = mapped_column(
-        ForeignKey("results.id", ondelete="CASCADE"), index=True
-    )
+    result_id: Mapped[str] = mapped_column(ForeignKey("results.id", ondelete="CASCADE"), index=True)
     run_evaluator_id: Mapped[str] = mapped_column(
         ForeignKey("run_evaluators.id", ondelete="CASCADE")
     )
