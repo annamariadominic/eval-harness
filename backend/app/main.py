@@ -7,7 +7,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.errors import register_error_handlers
-from app.api.routes import evaluators, health, meta, runs, suites, test_cases, variants
+from app.api.routes import (
+    comparisons,
+    evaluators,
+    health,
+    meta,
+    runs,
+    suites,
+    test_cases,
+    variants,
+)
 from app.config import Settings, get_settings
 from app.db.session import Database
 from app.pricing import PricingTable
@@ -59,6 +68,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         variants.router,
         evaluators.router,
         runs.router,
+        comparisons.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     return app

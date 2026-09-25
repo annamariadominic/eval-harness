@@ -60,6 +60,8 @@ class CaseComparison:
     delta: float | None
     change: Change
     mixed: bool = False
+    base_error_type: str | None = None
+    target_error_type: str | None = None
     evaluators: list[EvaluatorDelta] = field(default_factory=list)
 
 
@@ -140,6 +142,8 @@ def compare_case(base: CaseRecord | None, target: CaseRecord) -> CaseComparison:
         delta=delta,
         change=change,
         mixed=Change.REGRESSED in changes and Change.IMPROVED in changes,
+        base_error_type=base.error_type if base else None,
+        target_error_type=target.error_type,
         evaluators=deltas,
     )
 
