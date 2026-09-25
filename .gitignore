@@ -35,3 +35,6 @@ frontend/out/
 frontend/next-env.d.ts
 *.tsbuildinfo
 npm-debug.log*
+
+# Local agent/editor tooling
+.claude/
