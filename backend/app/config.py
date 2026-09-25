@@ -40,6 +40,15 @@ class Settings(BaseSettings):
     )
     request_timeout_s: float = Field(default=60.0, validation_alias="EVAL_HARNESS_REQUEST_TIMEOUT")
 
+    def resolved_database_url(self) -> str:
+        """Relative SQLite paths resolve from backend/, regardless of the working directory."""
+        prefix = "sqlite+aiosqlite:///"
+        if self.database_url.startswith(prefix):
+            path = self.database_url.removeprefix(prefix)
+            if path and ":memory:" not in path and not Path(path).is_absolute():
+                return f"{prefix}{BACKEND_ROOT / path}"
+        return self.database_url
+
     def resolved_pricing_file(self) -> Path:
         path = self.pricing_file
         return path if path.is_absolute() else BACKEND_ROOT / path

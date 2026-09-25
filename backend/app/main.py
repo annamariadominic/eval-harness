@@ -33,7 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        db = Database(settings.database_url)
+        db = Database(settings.resolved_database_url())
         await db.create_all()
         app.state.db = db
         app.state.settings = settings
