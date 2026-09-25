@@ -127,6 +127,7 @@ class ComparisonReport(ApiModel):
     cases: list[CaseComparisonOut]
     slices: list[SliceRowOut]
     slice_threshold: float
+    slice_evaluator: str | None = None
 
 
 class ScoreDetail(ApiModel):

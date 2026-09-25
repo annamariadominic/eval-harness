@@ -54,6 +54,19 @@ async def test_baseline_and_regression_workflow(app: FastAPI, client: AsyncClien
     assert [s["tag"] for s in report["slices"]] == ["hard"]
     assert report["evaluators"][0]["scoring"] == "binary"
 
+    by_evaluator = (
+        await client.get(
+            "/api/compare",
+            params={
+                "base": baseline_arm,
+                "target": candidate_arm,
+                "slice_evaluator": report["evaluators"][0]["key"],
+            },
+        )
+    ).json()
+    assert by_evaluator["slice_evaluator"] == report["evaluators"][0]["key"]
+    assert by_evaluator["slices"][0]["delta"] == -1.0
+
     inspect = await client.get(
         "/api/case-results",
         params={"test_case_id": case["test_case_id"], "arms": [baseline_arm, candidate_arm]},
