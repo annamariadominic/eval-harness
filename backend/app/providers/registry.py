@@ -26,7 +26,9 @@ class ProviderRegistry:
 
     @classmethod
     def from_settings(cls, settings: Settings) -> "ProviderRegistry":
-        providers: dict[str, ModelProvider] = {"mock": MockProvider()}
+        providers: dict[str, ModelProvider] = {
+            "mock": MockProvider(latency_scale=settings.mock_latency_scale)
+        }
         if settings.openai_api_key:
             providers["openai"] = OpenAIProvider(
                 api_key=settings.openai_api_key, timeout_s=settings.request_timeout_s
