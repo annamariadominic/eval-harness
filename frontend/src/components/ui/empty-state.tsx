@@ -31,11 +31,12 @@ export function LoadingRows({ rows = 4 }: { rows?: number }) {
 export function ErrorNotice({ error }: { error: unknown }) {
   const message = error instanceof Error ? error.message : "Something went wrong";
   return (
-    <div role="alert" className="rounded-lg border border-bad/30 bg-bad-soft px-4 py-3 text-sm text-bad">
+    <div
+      role="alert"
+      className="rounded-lg border border-bad/30 bg-bad-soft px-4 py-3 text-sm text-bad"
+    >
       <p className="font-medium">Could not load this data</p>
-      <p className="mt-0.5 text-xs">
-        {message}. Check that the backend is running on port 8000.
-      </p>
+      <p className="mt-0.5 text-xs">{message}. Check that the backend is running on port 8000.</p>
     </div>
   );
 }

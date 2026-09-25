@@ -550,7 +550,7 @@ export interface components {
             /** Tags */
             tags: string[];
             /** Metadata */
-            metadata?: {
+            metadata: {
                 [key: string]: unknown;
             };
         };
@@ -584,7 +584,7 @@ export interface components {
             /** Slice Threshold */
             slice_threshold: number;
             /** Slice Evaluator */
-            slice_evaluator?: string | null;
+            slice_evaluator: string | null;
         };
         /** Coverage */
         Coverage: {
@@ -703,7 +703,7 @@ export interface components {
             /** Type */
             type: string;
             /** Config */
-            config?: {
+            config: {
                 [key: string]: unknown;
             };
             /**
@@ -804,7 +804,7 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
-            best?: components["schemas"]["ArmScore"] | null;
+            best: components["schemas"]["ArmScore"] | null;
         };
         /** ProviderOut */
         ProviderOut: {
@@ -1187,7 +1187,7 @@ export interface components {
              * Key
              * @description Optional human-friendly identifier.
              */
-            key?: string | null;
+            key: string | null;
             /**
              * Input
              * @description String or JSON value passed to the prompt template.
@@ -1197,11 +1197,11 @@ export interface components {
              * Expected
              * @description Reference output, if evaluators need one.
              */
-            expected?: unknown;
+            expected: unknown;
             /** Tags */
-            tags?: string[];
+            tags: string[];
             /** Metadata */
-            metadata?: {
+            metadata: {
                 [key: string]: unknown;
             };
         };
@@ -1211,7 +1211,7 @@ export interface components {
              * Key
              * @description Optional human-friendly identifier.
              */
-            key?: string | null;
+            key: string | null;
             /**
              * Input
              * @description String or JSON value passed to the prompt template.
@@ -1221,11 +1221,11 @@ export interface components {
              * Expected
              * @description Reference output, if evaluators need one.
              */
-            expected?: unknown;
+            expected: unknown;
             /** Tags */
-            tags?: string[];
+            tags: string[];
             /** Metadata */
-            metadata?: {
+            metadata: {
                 [key: string]: unknown;
             };
             /** Id */
@@ -1333,7 +1333,7 @@ export interface components {
              */
             user_template: string;
             /** Temperature */
-            temperature?: number | null;
+            temperature: number | null;
             /**
              * Max Tokens
              * @default 1024
@@ -1343,7 +1343,7 @@ export interface components {
              * Settings
              * @description Provider-specific options passed through verbatim.
              */
-            settings?: {
+            settings: {
                 [key: string]: unknown;
             };
             /** Id */
@@ -1351,7 +1351,7 @@ export interface components {
             /** Suite Id */
             suite_id: string;
             /** Template Variables */
-            template_variables?: string[];
+            template_variables: string[];
             /**
              * Created At
              * Format: date-time

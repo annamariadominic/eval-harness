@@ -35,10 +35,21 @@ export function CreateSuiteDialog({ open, onClose }: { open: boolean; onClose: (
   }
 
   return (
-    <Dialog open={open} onClose={onClose} title="New suite" description="A suite groups a dataset with the variants and evaluators you compare on it.">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title="New suite"
+      description="A suite groups a dataset with the variants and evaluators you compare on it."
+    >
       <form onSubmit={submit} className="space-y-4">
         <Field label="Name">
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} required autoFocus placeholder="Support answer quality" />
+          <TextInput
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoFocus
+            placeholder="Support answer quality"
+          />
         </Field>
         <Field label="Description" hint="What feature does this suite evaluate?">
           <TextArea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />

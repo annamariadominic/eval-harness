@@ -14,7 +14,7 @@ export function CodeBlock({
   return (
     <pre
       className={cn(
-        "overflow-auto rounded-md border border-line bg-surface-2 px-3 py-2.5 font-mono text-xs leading-relaxed whitespace-pre-wrap break-words text-ink",
+        "overflow-auto rounded-md border border-line bg-surface-2 px-3 py-2.5 font-mono text-xs leading-relaxed break-words whitespace-pre-wrap text-ink",
         maxHeight,
         className,
       )}

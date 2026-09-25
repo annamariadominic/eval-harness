@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "gen:api": "cd ../backend && EVAL_HARNESS_SEED_EXAMPLES=false uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi(), indent=2))\" > ../frontend/src/lib/api/openapi.json && cd ../frontend && openapi-typescript src/lib/api/openapi.json -o src/lib/api/schema.d.ts"
+    "gen:api": "cd ../backend && EVAL_HARNESS_SEED_EXAMPLES=false uv run python -c \"import json; from app.main import app; print(json.dumps(app.openapi(), indent=2))\" > ../frontend/src/lib/api/openapi.json && cd ../frontend && openapi-typescript src/lib/api/openapi.json -o src/lib/api/schema.d.ts",
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
   },
   "dependencies": {
     "lucide-react": "^1.48.0",
@@ -30,6 +32,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "jsdom": "^29.1.1",
+    "openapi-typescript": "^7.13.0",
+    "prettier": "^3.9.9",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",

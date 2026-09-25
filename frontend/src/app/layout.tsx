@@ -25,7 +25,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${plexSans.variable} ${plexMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>

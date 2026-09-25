@@ -93,7 +93,10 @@ export function deltaTone(delta: number | null | undefined, deadZone = 0.005): T
 }
 
 /** Lower-is-better tone (latency, cost), relative to the reference value. */
-export function costTone(delta: number | null | undefined, reference: number | null | undefined): Tone {
+export function costTone(
+  delta: number | null | undefined,
+  reference: number | null | undefined,
+): Tone {
   if (delta === null || delta === undefined || !reference) return "neutral";
   if (Math.abs(delta) / reference < 0.05) return "neutral";
   return delta < 0 ? "good" : "bad";
