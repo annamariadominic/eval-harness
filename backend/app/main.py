@@ -23,6 +23,7 @@ from app.pricing import PricingTable
 from app.providers.registry import ProviderRegistry
 from app.runner.executor import RunExecutor
 from app.runner.manager import RunManager
+from app.seed.loader import seed_if_empty
 
 API_PREFIX = "/api"
 
@@ -41,6 +42,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         executor = RunExecutor(db.sessionmaker, app.state.providers, app.state.pricing)
         app.state.run_manager = RunManager(db.sessionmaker, executor)
         await app.state.run_manager.recover_interrupted()
+        if settings.seed_examples:
+            await seed_if_empty(db.sessionmaker, app.state.providers, app.state.pricing, settings)
         try:
             yield
         finally:
