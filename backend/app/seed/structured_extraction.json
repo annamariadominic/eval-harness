@@ -1,0 +1,138 @@
+{
+  "name": "Structured Extraction",
+  "description": "Extract company, annual revenue (USD, full integer), and fiscal year from messy business-document excerpts. Checks JSON validity, schema compliance, required fields, and field-level accuracy. All documents are synthetic.",
+  "cases": [
+    {
+      "key": "acme-press-release",
+      "input": "FOR IMMEDIATE RELEASE — Acme Corp today announced results for fiscal 2025. Revenue came in at $4.2 billion, ahead of guidance. Operating margin expanded to 14%.",
+      "expected": {"company": "Acme Corp", "revenue": 4200000000, "year": 2025},
+      "tags": ["clean", "press-release"]
+    },
+    {
+      "key": "globex-memo",
+      "input": "MEMO — Q4 wrap-up\nTo: Board\nGlobex Holdings closed FY2024 with total revenue of USD 310 million. Marketing spend: $12M (flat). Cash on hand ~$40M.",
+      "expected": {"company": "Globex Holdings", "revenue": 310000000, "year": 2024},
+      "tags": ["messy", "distractor", "abbreviated-units"]
+    },
+    {
+      "key": "brightline-10k-excerpt",
+      "input": "Item 7. Management's Discussion. For the fiscal year ended December 31, 2024, Brightline Robotics Inc. recognized revenue of $1,250,000,000 compared with $980,000,000 in the prior fiscal year.",
+      "expected": {"company": "Brightline Robotics Inc", "revenue": 1250000000, "year": 2024},
+      "tags": ["clean", "filing", "full-number"]
+    },
+    {
+      "key": "halcyon-slide-notes",
+      "input": "speaker notes (slide 4): Halcyon Labs — FY '25 topline $86.5m, burn down 20%, runway into 2028. R&D headcount +15.",
+      "expected": {"company": "Halcyon Labs", "revenue": 86500000, "year": 2025},
+      "tags": ["messy", "abbreviated-units"]
+    },
+    {
+      "key": "norrland-email",
+      "input": "hi team — quick one. finance confirmed Norrland Shipping Group did $2.1bn in revenue for fiscal year 2023 (bunker costs were $650m). pls update the deck before thursday. thx",
+      "expected": {"company": "Norrland Shipping Group", "revenue": 2100000000, "year": 2023},
+      "tags": ["messy", "distractor", "abbreviated-units"]
+    },
+    {
+      "key": "veridian-earnings-call",
+      "input": "Operator: Welcome to the Veridian Foods Corp earnings call. CFO: Thanks. We spent $95 million on capex this year. For fiscal 2025, net sales were $3.4 billion, and we expect low single digit growth next year.",
+      "expected": {"company": "Veridian Foods Corp", "revenue": 3400000000, "year": 2025},
+      "tags": ["messy", "distractor", "transcript"]
+    },
+    {
+      "key": "tessellate-investor-update",
+      "input": "Tessellate Technologies investor update. FY2025 highlights: revenue $342 million (services included); ARR $310M; NRR 118%.",
+      "expected": {"company": "Tessellate Technologies", "revenue": 342000000, "year": 2025},
+      "tags": ["clean", "distractor"]
+    },
+    {
+      "key": "orchard-annual-letter",
+      "input": "Dear shareholders, 2024 was a year of disciplined growth for Orchard Health Systems. Revenue rose to $1.9 billion in fiscal year 2024 as patient visits increased 22%.",
+      "expected": {"company": "Orchard Health Systems", "revenue": 1900000000, "year": 2024},
+      "tags": ["clean", "letter"]
+    },
+    {
+      "key": "pinecrest-news-brief",
+      "input": "BRIEF: Pinecrest Insurance Group (PIG) — gross premiums written $2.8B; total revenue for fiscal 2024 reached $3.05 billion; combined ratio 97.3%.",
+      "expected": {"company": "Pinecrest Insurance Group", "revenue": 3050000000, "year": 2024},
+      "tags": ["messy", "distractor", "abbreviated-units"]
+    },
+    {
+      "key": "cobalt-ridge-table",
+      "input": "Cobalt Ridge Industries | FY2023 | Revenue: $5,600,000 (thousands omitted? no — reported in full) | Employees: 2,300",
+      "expected": {"company": "Cobalt Ridge Industries", "revenue": 5600000, "year": 2023},
+      "tags": ["messy", "full-number"]
+    }
+  ],
+  "variants": [
+    {
+      "name": "Baseline · free-form",
+      "provider": "mock",
+      "model": "mock-small",
+      "system_prompt": "Extract the company name, annual revenue, and fiscal year from the document as JSON.",
+      "user_template": "{{ input }}",
+      "temperature": 0.0,
+      "max_tokens": 256
+    },
+    {
+      "name": "Strict JSON · prompt v2",
+      "provider": "mock",
+      "model": "mock-small",
+      "system_prompt": "Return only JSON with exactly these keys: company (string), revenue (integer, the full number in USD), year (integer fiscal year). No prose, no markdown.",
+      "user_template": "Document:\n{{ input }}",
+      "temperature": 0.0,
+      "max_tokens": 256
+    },
+    {
+      "name": "Strict JSON · large model",
+      "provider": "mock",
+      "model": "mock-large",
+      "system_prompt": "Return only JSON with exactly these keys: company (string), revenue (integer, the full number in USD), year (integer fiscal year). No prose, no markdown.",
+      "user_template": "Document:\n{{ input }}",
+      "temperature": 0.0,
+      "max_tokens": 256
+    },
+    {
+      "name": "GPT-5 mini · prompt v2",
+      "description": "Requires OPENAI_API_KEY.",
+      "provider": "openai",
+      "model": "gpt-5-mini",
+      "system_prompt": "Return only JSON with exactly these keys: company (string), revenue (integer, the full number in USD), year (integer fiscal year). No prose, no markdown.",
+      "user_template": "Document:\n{{ input }}",
+      "max_tokens": 256
+    }
+  ],
+  "evaluators": [
+    {"name": "Valid JSON", "type": "json_valid", "config": {}},
+    {
+      "name": "Schema compliance",
+      "type": "json_schema",
+      "config": {
+        "json_schema": {
+          "type": "object",
+          "properties": {
+            "company": {"type": "string", "minLength": 1},
+            "revenue": {"type": "integer", "minimum": 0},
+            "year": {"type": "integer", "minimum": 1900, "maximum": 2100}
+          },
+          "required": ["company", "revenue", "year"],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "name": "Required fields",
+      "type": "required_fields",
+      "config": {"fields": ["company", "revenue", "year"]}
+    },
+    {
+      "name": "Field accuracy",
+      "type": "field_match",
+      "regression_threshold": 0.1,
+      "config": {"numeric_tolerance": 0.005, "pass_threshold": 1.0}
+    }
+  ],
+  "runs": [
+    {"name": "Baseline · free-form prompt", "variants": [0], "baseline": true},
+    {"name": "Strict JSON prompt", "variants": [1, 2]}
+  ]
+}

@@ -59,12 +59,13 @@ MONEY_RE = re.compile(
     re.IGNORECASE,
 )
 COMPANY_RE = re.compile(
-    r"\b([A-Z][\w&'-]*(?:\s+[A-Z][\w&'-]*){0,3}\s+"
+    r"\b([A-Z][\w&'-]*(?:[ \t]+[A-Z][\w&'-]*){0,3}[ \t]+"
     r"(?:Inc|Corp|Corporation|Ltd|LLC|Group|Holdings|Industries|Labs|Systems|Technologies|GmbH|PLC))\b\.?"
 )
 YEAR_RE = re.compile(r"\b(?:fiscal(?:\s+year)?|FY)\s*'?(\d{4}|\d{2})\b", re.IGNORECASE)
 PLAIN_YEAR_RE = re.compile(r"\b(20\d{2})\b")
-REVENUE_WORDS = re.compile(r"revenue|sales|turnover|top line|top-line", re.IGNORECASE)
+REVENUE_WORDS = re.compile(r"revenue|sales|turnover|top ?-?line", re.IGNORECASE)
+CLAUSE_BREAK_RE = re.compile(r"[;()\n]|\.\s")
 MULTIPLIERS = {
     "billion": 1e9, "bn": 1e9, "b": 1e9,
     "million": 1e6, "mn": 1e6, "m": 1e6,
@@ -204,20 +205,22 @@ def _extract(system: str, user: str, config: ModelConfig) -> str:
 
 
 def _find_revenue(text: str, *, distracted: bool) -> tuple[int, str] | None:
+    """Prefer an amount in the same clause as a revenue keyword; a distracted model just takes
+    the first amount it sees."""
     matches = list(MONEY_RE.finditer(text))
     if not matches:
         return None
-    keyword_positions = [m.start() for m in REVENUE_WORDS.finditer(text)]
-    if distracted or not keyword_positions:
-        chosen = matches[0]
-    else:
-        chosen = min(
-            matches,
-            key=lambda m: min(
-                (m.start() - k if m.start() >= k else 10_000 + k - m.start())
-                for k in keyword_positions
-            ),
-        )
+    chosen = matches[0]
+    if not distracted:
+        bounds = [0, *(m.end() for m in CLAUSE_BREAK_RE.finditer(text)), len(text)]
+        for keyword in REVENUE_WORDS.finditer(text):
+            lo = max(b for b in bounds if b <= keyword.start())
+            hi = min(b for b in bounds if b > keyword.start())
+            in_clause = [m for m in matches if lo <= m.start() < hi]
+            if in_clause:
+                after = [m for m in in_clause if m.start() >= keyword.start()]
+                chosen = (after or in_clause)[0]
+                break
     number = float(chosen.group(1).replace(",", ""))
     unit = (chosen.group(2) or "").lower()
     return round(number * MULTIPLIERS.get(unit, 1)), chosen.group(0).strip()
@@ -299,8 +302,17 @@ def _content_terms(text: str) -> list[str]:
             terms.extend([number_with_unit.group(1), unit[number_with_unit.group(2)]])
             continue
         if token and token not in STOPWORDS and not re.fullmatch(r"\[?\d\]?", token):
-            terms.append(token)
+            terms.append(_stem(token))
     return terms
+
+
+def _stem(token: str) -> str:
+    """Crude suffix stripping so "opened"/"open" and "vessels"/"vessel" line up."""
+    if token.isalpha() and len(token) > 4:
+        for suffix in ("ing", "ed", "es", "s"):
+            if token.endswith(suffix) and len(token) - len(suffix) >= 3:
+                return token[: -len(suffix)]
+    return token
 
 
 def _estimate_tokens(text: str) -> int:

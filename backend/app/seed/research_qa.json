@@ -1,0 +1,191 @@
+{
+  "name": "Research QA",
+  "description": "Answer analyst questions from retrieved context passages. Checks factual correctness, faithfulness to the context, and source citation. All companies and figures are fictional.",
+  "cases": [
+    {
+      "key": "acme-revenue-2025",
+      "input": {
+        "question": "What was Acme Corp's fiscal 2025 revenue?",
+        "context": "[1] Acme Corp reported fiscal 2025 revenue of $4.2 billion, up 12% from the prior year.\n[2] Acme Corp opened two new distribution centers in Ohio during 2025.\n[3] The company's headcount reached 18,500 employees at year end."
+      },
+      "expected": {"answer": "$4.2 billion"},
+      "tags": ["financial", "easy"]
+    },
+    {
+      "key": "brightline-margin",
+      "input": {
+        "question": "What gross margin did Brightline Robotics report for 2024?",
+        "context": "[1] Brightline Robotics shipped 3,200 warehouse units in 2024, a company record.\n[2] Brightline Robotics reported a gross margin of 41% for 2024, compared with 37% in 2023.\n[3] Management expects unit shipments to grow in 2025 as the Denver plant ramps up."
+      },
+      "expected": {"answer": "41%"},
+      "tags": ["financial", "easy"]
+    },
+    {
+      "key": "halcyon-trial-phase",
+      "input": {
+        "question": "Which phase is Halcyon Biotech's HX-204 trial in?",
+        "context": "[1] Halcyon Biotech was founded in 2016 and is headquartered in Cambridge.\n[2] The HX-204 program entered a Phase 2 trial in March after positive Phase 1 safety data.\n[3] Halcyon raised $120 million in a Series C round led by Meridian Ventures."
+      },
+      "expected": {"answer": "Phase 2"},
+      "tags": ["science", "easy"]
+    },
+    {
+      "key": "norrland-fleet",
+      "input": {
+        "question": "How many vessels does Norrland Shipping operate?",
+        "context": "[1] Norrland Shipping operates a fleet of 47 vessels across the Baltic and North Sea.\n[2] Fuel costs represented 31% of Norrland's operating expenses last year.\n[3] The company plans to retrofit 12 ships with hybrid engines by 2027.\n[4] Norrland's largest customer is a Swedish timber cooperative."
+      },
+      "expected": {"answer": "47 vessels"},
+      "tags": ["operations", "easy"]
+    },
+    {
+      "key": "veridian-ceo",
+      "input": {
+        "question": "Who became chief executive of Veridian Foods in 2025?",
+        "context": "[1] Veridian Foods named Priya Raman as chief executive in January 2025, succeeding Tom Ellery.\n[2] Tom Ellery will remain on the board as non-executive chair.\n[3] Veridian Foods sells frozen meals in 14 countries."
+      },
+      "expected": {"answer": "Priya Raman"},
+      "tags": ["people", "easy"]
+    },
+    {
+      "key": "cobalt-ridge-output",
+      "input": {
+        "question": "What was Cobalt Ridge Mining's copper output in 2024 compared with 2023?",
+        "context": "[1] Cobalt Ridge Mining produced 212,000 tonnes of copper in 2023.\n[2] Cobalt Ridge Mining's copper output fell to 188,000 tonnes in 2024 after flooding at the Tamarack pit.\n[3] Nickel production at the northern site was broadly flat year over year.\n[4] The company expects Tamarack to return to full capacity in the second half of 2025."
+      },
+      "expected": {"answer": "188,000 tonnes in 2024, down from 212,000 tonnes in 2023"},
+      "tags": ["operations", "hard", "multi-hop"]
+    },
+    {
+      "key": "lumen-grid-capacity",
+      "input": {
+        "question": "How much new solar capacity did Lumen Grid Energy connect in 2025?",
+        "context": "[1] Lumen Grid Energy's wind portfolio generated 9.1 TWh in 2025.\n[2] Battery storage deployments reached 1.2 GW of cumulative capacity.\n[3] Lumen Grid Energy connected 2.4 GW of new solar capacity to the grid in 2025.\n[4] The utility's customer base grew to 3.1 million accounts.\n[5] Regulators approved a 4% tariff increase effective in 2026."
+      },
+      "expected": {"answer": "2.4 GW"},
+      "tags": ["operations", "long-context", "hard"]
+    },
+    {
+      "key": "tessellate-arr",
+      "input": {
+        "question": "What annual recurring revenue did Tessellate Software reach at the end of 2025?",
+        "context": "[1] Tessellate Software closed 2025 with annual recurring revenue of $310 million.\n[2] Net revenue retention was 118% for the year.\n[3] Tessellate's total revenue, including services, was $342 million in 2025.\n[4] The company employs 1,400 people across four offices."
+      },
+      "expected": {"answer": "$310 million"},
+      "tags": ["financial", "hard", "distractor"]
+    },
+    {
+      "key": "orchard-health-clinics",
+      "input": {
+        "question": "How many clinics did Orchard Health open in 2025?",
+        "context": "[1] Orchard Health ended 2025 with 212 clinics in operation.\n[2] Orchard Health opened 38 new clinics in 2025, mostly in the Southeast.\n[3] Patient visits rose 22% to 4.6 million.\n[4] The company closed 5 underperforming clinics in Arizona."
+      },
+      "expected": {"answer": "38 clinics"},
+      "tags": ["operations", "hard", "distractor"]
+    },
+    {
+      "key": "pinecrest-combined-ratio",
+      "input": {
+        "question": "What was Pinecrest Insurance's combined ratio for 2024?",
+        "context": "[1] Pinecrest Insurance wrote $2.8 billion in gross premiums during 2024.\n[2] Catastrophe losses added 6.5 points to the loss ratio, mainly from spring hailstorms.\n[3] Pinecrest Insurance reported a combined ratio of 97.3% for 2024, an underwriting profit.\n[4] The investment portfolio returned 4.1% for the year.\n[5] Pinecrest plans to exit commercial auto lines in two states."
+      },
+      "expected": {"answer": "97.3%"},
+      "tags": ["financial", "long-context", "hard"]
+    },
+    {
+      "key": "acme-headcount",
+      "input": {
+        "question": "How many employees did Acme Corp have at the end of 2025?",
+        "context": "[1] Acme Corp reported fiscal 2025 revenue of $4.2 billion, up 12% from the prior year.\n[2] Acme Corp's headcount reached 18,500 employees at the end of 2025.\n[3] Acme Corp opened two new distribution centers in Ohio during 2025."
+      },
+      "expected": {"answer": "18,500 employees"},
+      "tags": ["people", "easy"]
+    },
+    {
+      "key": "halcyon-funding",
+      "input": {
+        "question": "Which firm led Halcyon Biotech's Series C round, and how much was raised?",
+        "context": "[1] Halcyon Biotech raised $120 million in a Series C round led by Meridian Ventures.\n[2] Existing investors Alder Capital and Northgate Partners also participated.\n[3] Proceeds will fund the HX-204 Phase 2 trial and manufacturing scale-up."
+      },
+      "expected": {"answer": "Meridian Ventures led the $120 million Series C"},
+      "tags": ["financial", "multi-hop", "hard"]
+    }
+  ],
+  "variants": [
+    {
+      "name": "Baseline · prompt v1",
+      "provider": "mock",
+      "model": "mock-small",
+      "system_prompt": "You are a helpful research assistant. Answer the user's question.",
+      "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+      "temperature": 0.0,
+      "max_tokens": 512
+    },
+    {
+      "name": "Grounded + cited · prompt v2",
+      "provider": "mock",
+      "model": "mock-small",
+      "system_prompt": "You are a research assistant. Answer using only the context provided. Be concise. Cite the passage you relied on as [n].",
+      "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+      "temperature": 0.0,
+      "max_tokens": 512,
+      "settings": {"mock_failure_rate": 0.1}
+    },
+    {
+      "name": "Grounded + cited · large model",
+      "provider": "mock",
+      "model": "mock-large",
+      "system_prompt": "You are a research assistant. Answer using only the context provided. Be concise. Cite the passage you relied on as [n].",
+      "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+      "temperature": 0.0,
+      "max_tokens": 512
+    },
+    {
+      "name": "Claude Sonnet 5 · prompt v2",
+      "description": "Requires ANTHROPIC_API_KEY.",
+      "provider": "anthropic",
+      "model": "claude-sonnet-5",
+      "system_prompt": "You are a research assistant. Answer using only the context provided. Be concise. Cite the passage you relied on as [n].",
+      "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+      "max_tokens": 512
+    }
+  ],
+  "evaluators": [
+    {
+      "name": "Correctness",
+      "type": "llm_judge",
+      "regression_threshold": 0.1,
+      "config": {
+        "provider": "mock",
+        "model": "mock-large",
+        "criteria": "Does the response state the same facts as the reference answer? Penalise missing, incorrect, or conflicting figures, dates, and names. Extra correct detail is fine.",
+        "score_min": 1,
+        "score_max": 5,
+        "pass_threshold": 0.75
+      }
+    },
+    {
+      "name": "Faithfulness",
+      "type": "llm_judge",
+      "regression_threshold": 0.1,
+      "config": {
+        "provider": "mock",
+        "model": "mock-large",
+        "criteria": "Is every claim in the response supported by the provided context? Penalise speculation, outside knowledge, and hallucinated details, even when they sound plausible.",
+        "score_min": 0,
+        "score_max": 1,
+        "pass_threshold": 0.8,
+        "include_expected": false
+      }
+    },
+    {
+      "name": "Cites a passage",
+      "type": "regex",
+      "config": {"pattern": "\\[\\d+\\]"}
+    }
+  ],
+  "runs": [
+    {"name": "Baseline · prompt v1", "variants": [0], "baseline": true},
+    {"name": "Prompt v2 candidates", "variants": [0, 1, 2]}
+  ]
+}
