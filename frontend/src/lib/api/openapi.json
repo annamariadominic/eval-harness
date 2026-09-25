@@ -2147,7 +2147,8 @@
           "key",
           "input",
           "expected",
-          "tags"
+          "tags",
+          "metadata"
         ],
         "title": "CaseSnapshot"
       },
@@ -2280,7 +2281,8 @@
           "evaluators",
           "cases",
           "slices",
-          "slice_threshold"
+          "slice_threshold",
+          "slice_evaluator"
         ],
         "title": "ComparisonReport"
       },
@@ -2627,6 +2629,8 @@
         "required": [
           "name",
           "type",
+          "config",
+          "regression_threshold",
           "id",
           "suite_id",
           "created_at",
@@ -2865,7 +2869,8 @@
           "id",
           "name",
           "status",
-          "created_at"
+          "created_at",
+          "best"
         ],
         "title": "LatestRun"
       },
@@ -4031,7 +4036,11 @@
         },
         "type": "object",
         "required": [
-          "input"
+          "key",
+          "input",
+          "expected",
+          "tags",
+          "metadata"
         ],
         "title": "TestCaseCreate"
       },
@@ -4091,7 +4100,11 @@
         },
         "type": "object",
         "required": [
+          "key",
           "input",
+          "expected",
+          "tags",
+          "metadata",
           "id",
           "suite_id",
           "created_at",
@@ -4352,11 +4365,17 @@
         "type": "object",
         "required": [
           "name",
+          "description",
           "provider",
           "model",
+          "system_prompt",
           "user_template",
+          "temperature",
+          "max_tokens",
+          "settings",
           "id",
           "suite_id",
+          "template_variables",
           "created_at",
           "updated_at"
         ],
