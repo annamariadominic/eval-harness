@@ -1,9 +1,10 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { Suspense } from "react";
 
+import { RunComparison } from "@/components/compare/run-comparison";
 import { RunHeader } from "@/components/runs/run-header";
-import { RunResults } from "@/components/runs/run-results";
 import { ErrorNotice, LoadingRows } from "@/components/ui/empty-state";
 import { useRun } from "@/lib/api/hooks";
 
@@ -15,7 +16,9 @@ export default function RunPage() {
   return (
     <>
       <RunHeader run={run} />
-      <RunResults run={run} />
+      <Suspense fallback={<LoadingRows rows={4} />}>
+        <RunComparison run={run} />
+      </Suspense>
     </>
   );
 }
