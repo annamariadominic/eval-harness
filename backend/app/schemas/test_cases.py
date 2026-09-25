@@ -16,7 +16,7 @@ class TestCaseFields(ApiModel):
     expected: Any = Field(default=None, description="Reference output, if evaluators need one.")
     tags: list[str] = Field(default_factory=list)
     metadata: dict[str, Any] = Field(
-        default_factory=dict, validation_alias=AliasChoices("metadata", "meta")
+        default_factory=dict, validation_alias=AliasChoices("meta", "metadata")
     )
 
     @field_validator("input")
