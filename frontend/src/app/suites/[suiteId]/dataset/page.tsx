@@ -85,7 +85,7 @@ function Dataset() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <TextInput
-            className="max-w-64"
+            className="w-64"
             placeholder="Search inputs, outputs, keys"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
