@@ -7,14 +7,6 @@ const toneClass: Record<Tone, string> = {
   neutral: "text-muted",
 };
 
-export function Delta({
-  text,
-  tone,
-  className,
-}: {
-  text: string;
-  tone: Tone;
-  className?: string;
-}) {
+export function Delta({ text, tone, className }: { text: string; tone: Tone; className?: string }) {
   return <span className={cn("num font-medium", toneClass[tone], className)}>{text}</span>;
 }

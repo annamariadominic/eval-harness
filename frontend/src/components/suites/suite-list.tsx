@@ -56,7 +56,11 @@ function SuiteRow({ suite }: { suite: SuiteSummary }) {
         <p className="num mt-0.5 text-2xl font-semibold tracking-tight text-ink">
           {formatScore(best?.overall_score)}
         </p>
-        {best && <p className="truncate text-xs text-muted" title={best.variant_name}>{best.variant_name}</p>}
+        {best && (
+          <p className="truncate text-xs text-muted" title={best.variant_name}>
+            {best.variant_name}
+          </p>
+        )}
       </div>
 
       <div>

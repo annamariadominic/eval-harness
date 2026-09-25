@@ -9,8 +9,7 @@
  */
 
 export type ImportParse =
-  | { ok: true; cases: Array<Record<string, unknown>> }
-  | { ok: false; error: string };
+  { ok: true; cases: Array<Record<string, unknown>> } | { ok: false; error: string };
 
 function asCases(value: unknown): ImportParse {
   const list = Array.isArray(value)
@@ -22,7 +21,9 @@ function asCases(value: unknown): ImportParse {
     return { ok: false, error: 'Expected an array of cases or an object with a "cases" array' };
   }
   if (list.length === 0) return { ok: false, error: "The file contains no cases" };
-  const invalid = list.findIndex((item) => !item || typeof item !== "object" || Array.isArray(item));
+  const invalid = list.findIndex(
+    (item) => !item || typeof item !== "object" || Array.isArray(item),
+  );
   if (invalid !== -1) return { ok: false, error: `Case ${invalid} is not a JSON object` };
   return { ok: true, cases: list as Array<Record<string, unknown>> };
 }

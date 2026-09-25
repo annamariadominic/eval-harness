@@ -22,7 +22,11 @@ export default function SuiteOverviewPage() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="min-w-0 space-y-6">
-        {!ready || suite.evaluator_count === 0 ? <SetupChecklist suite={suite} /> : <Headline suite={suite} />}
+        {!ready || suite.evaluator_count === 0 ? (
+          <SetupChecklist suite={suite} />
+        ) : (
+          <Headline suite={suite} />
+        )}
         <Panel
           title="Recent runs"
           flush
@@ -90,7 +94,11 @@ function Headline({ suite }: { suite: SuiteDetail }) {
         </div>
         {suite.delta_vs_baseline !== null && suite.delta_vs_baseline !== undefined && (
           <div className="text-right">
-            <Delta className="text-3xl" text={formatDelta(suite.delta_vs_baseline)} tone={deltaTone(suite.delta_vs_baseline)} />
+            <Delta
+              className="text-3xl"
+              text={formatDelta(suite.delta_vs_baseline)}
+              tone={deltaTone(suite.delta_vs_baseline)}
+            />
             <p className="mt-1 text-xs text-muted">points vs baseline</p>
           </div>
         )}
@@ -102,9 +110,24 @@ function Headline({ suite }: { suite: SuiteDetail }) {
 
 function SetupChecklist({ suite }: { suite: SuiteDetail }) {
   const steps = [
-    { done: suite.test_case_count > 0, label: "Add test cases", href: "dataset", detail: "Write them by hand or import a JSON file." },
-    { done: suite.variant_count > 0, label: "Define a variant", href: "variants", detail: "A provider, a model, and a prompt template." },
-    { done: suite.evaluator_count > 0, label: "Add evaluators", href: "evaluators", detail: "Deterministic checks and LLM judges score each output." },
+    {
+      done: suite.test_case_count > 0,
+      label: "Add test cases",
+      href: "dataset",
+      detail: "Write them by hand or import a JSON file.",
+    },
+    {
+      done: suite.variant_count > 0,
+      label: "Define a variant",
+      href: "variants",
+      detail: "A provider, a model, and a prompt template.",
+    },
+    {
+      done: suite.evaluator_count > 0,
+      label: "Add evaluators",
+      href: "evaluators",
+      detail: "Deterministic checks and LLM judges score each output.",
+    },
   ];
   return (
     <Panel title="Set up this suite" description="Three steps before the first run.">
@@ -117,7 +140,10 @@ function SetupChecklist({ suite }: { suite: SuiteDetail }) {
               <Circle size={16} className="mt-0.5 text-faint" aria-label="to do" />
             )}
             <div>
-              <Link href={`/suites/${suite.id}/${step.href}`} className="text-[13px] font-medium text-ink hover:text-accent">
+              <Link
+                href={`/suites/${suite.id}/${step.href}`}
+                className="text-[13px] font-medium text-ink hover:text-accent"
+              >
                 {step.label}
               </Link>
               <p className="text-xs text-muted">{step.detail}</p>
@@ -135,7 +161,9 @@ function BaselinePanel({ suite }: { suite: SuiteDetail }) {
     <Panel title="Baseline" description="New runs are compared against this reference.">
       {baseline ? (
         <div>
-          <p className="num text-2xl font-semibold text-ink">{formatScore(baseline.overall_score)}</p>
+          <p className="num text-2xl font-semibold text-ink">
+            {formatScore(baseline.overall_score)}
+          </p>
           <p className="mt-1 text-xs text-muted">{baseline.variant_name}</p>
           <Link href={`/runs/${baseline.run_id}`} className="mt-2 inline-block text-xs text-accent">
             {baseline.run_name}
@@ -143,7 +171,8 @@ function BaselinePanel({ suite }: { suite: SuiteDetail }) {
         </div>
       ) : (
         <p className="text-xs text-muted">
-          No baseline yet. Open a completed run and choose <span className="text-ink">Set as baseline</span>.
+          No baseline yet. Open a completed run and choose{" "}
+          <span className="text-ink">Set as baseline</span>.
         </p>
       )}
     </Panel>
@@ -161,11 +190,17 @@ function TagPanel({ suite }: { suite: SuiteDetail }) {
         <ul className="space-y-1.5">
           {entries.map(([tag, count]) => (
             <li key={tag} className="grid grid-cols-[96px_1fr_24px] items-center gap-2 text-xs">
-              <Link href={`/suites/${suite.id}/dataset?tag=${encodeURIComponent(tag)}`} className="truncate text-muted hover:text-ink">
+              <Link
+                href={`/suites/${suite.id}/dataset?tag=${encodeURIComponent(tag)}`}
+                className="truncate text-muted hover:text-ink"
+              >
                 {tag}
               </Link>
               <span className="h-1.5 rounded-full bg-surface-2">
-                <span className="block h-full rounded-full bg-neutral-bar" style={{ width: `${(count / max) * 100}%` }} />
+                <span
+                  className="block h-full rounded-full bg-neutral-bar"
+                  style={{ width: `${(count / max) * 100}%` }}
+                />
               </span>
               <span className="num text-right text-muted">{count}</span>
             </li>

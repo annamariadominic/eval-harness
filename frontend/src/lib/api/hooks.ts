@@ -18,7 +18,7 @@ import {
   type Variant,
 } from "./types";
 
-const fetcher = <T,>(path: string) => api.get<T>(path);
+const fetcher = <T>(path: string) => api.get<T>(path);
 const POLL_MS = 1000;
 
 function useApi<T>(path: string | null, config?: SWRConfiguration<T>) {

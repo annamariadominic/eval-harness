@@ -16,7 +16,11 @@ export default function SuiteRunsPage() {
       <EmptyState
         title="No runs yet"
         description="A run executes the selected test cases against each selected variant and scores every output."
-        action={<ButtonLink href={`/suites/${suiteId}/runs/new`} variant="primary">Run evaluation</ButtonLink>}
+        action={
+          <ButtonLink href={`/suites/${suiteId}/runs/new`} variant="primary">
+            Run evaluation
+          </ButtonLink>
+        }
       />
     );
   }

@@ -33,7 +33,11 @@ export default function SuitesPage() {
         <EmptyState
           title="No suites yet"
           description="Create a suite, import a dataset, and define the variants you want to compare."
-          action={<Button variant="primary" onClick={() => setCreating(true)}>New suite</Button>}
+          action={
+            <Button variant="primary" onClick={() => setCreating(true)}>
+              New suite
+            </Button>
+          }
         />
       ) : (
         <SuiteList suites={suites} />

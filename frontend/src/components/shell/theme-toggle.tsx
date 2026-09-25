@@ -49,7 +49,11 @@ export function ThemeToggle() {
     () => "system" as Theme,
   );
   return (
-    <div className="inline-flex rounded-md border border-line p-0.5" role="radiogroup" aria-label="Theme">
+    <div
+      className="inline-flex rounded-md border border-line p-0.5"
+      role="radiogroup"
+      aria-label="Theme"
+    >
       {OPTIONS.map(({ value, label, icon: Icon }) => (
         <button
           key={value}

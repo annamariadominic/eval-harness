@@ -59,7 +59,10 @@ describe("parseDatasetText", () => {
       ok: false,
       error: 'Expected an array of cases or an object with a "cases" array',
     });
-    expect(parseDatasetText("[1, 2]")).toMatchObject({ ok: false, error: "Case 0 is not a JSON object" });
+    expect(parseDatasetText("[1, 2]")).toMatchObject({
+      ok: false,
+      error: "Case 0 is not a JSON object",
+    });
     expect(parseDatasetText('{"input": "a"}\nnot json')).toMatchObject({
       ok: false,
       error: "Line 2 is not valid JSON",

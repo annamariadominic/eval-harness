@@ -26,7 +26,6 @@
   color-scheme: light;
 }
 
-
 :root[data-theme="dark"] {
   --bg: #0e1117;
   --surface: #151922;

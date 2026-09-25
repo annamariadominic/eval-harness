@@ -38,12 +38,6 @@ export type ArmResult = S["ArmResult"];
 export type ScoreDetail = S["ScoreDetail"];
 
 export type Change = "improved" | "regressed" | "unchanged" | "incomparable";
-export type RunStatus =
-  | "queued"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cancelled"
-  | "interrupted";
+export type RunStatus = "queued" | "running" | "completed" | "failed" | "cancelled" | "interrupted";
 
 export const ACTIVE_RUN_STATUSES: ReadonlySet<string> = new Set(["queued", "running"]);

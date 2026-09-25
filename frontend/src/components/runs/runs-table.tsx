@@ -61,7 +61,10 @@ export function RunsTable({ runs, showSuite }: { runs: Run[]; showSuite?: boolea
               <td className="px-4 py-3">
                 <ul className="space-y-0.5">
                   {armSummaries(run).map((arm) => (
-                    <li key={arm.name} className="flex items-baseline justify-between gap-4 text-xs">
+                    <li
+                      key={arm.name}
+                      className="flex items-baseline justify-between gap-4 text-xs"
+                    >
                       <span className="truncate text-muted">{arm.name}</span>
                       <span className="num font-medium text-ink">
                         {formatScore(arm.score)}

@@ -5,7 +5,11 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/cn";
 
-export function TabNav({ tabs }: { tabs: Array<{ href: string; label: string; count?: number; exact?: boolean }> }) {
+export function TabNav({
+  tabs,
+}: {
+  tabs: Array<{ href: string; label: string; count?: number; exact?: boolean }>;
+}) {
   const pathname = usePathname();
   return (
     <nav className="-mb-px flex gap-5 overflow-x-auto border-b border-line" aria-label="Sections">

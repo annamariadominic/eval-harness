@@ -20,7 +20,9 @@ export function parseLooseValue(text: string): ParsedValue {
   }
 }
 
-export function parseJsonObject(text: string): { ok: true; value: Record<string, unknown> } | { ok: false; error: string } {
+export function parseJsonObject(
+  text: string,
+): { ok: true; value: Record<string, unknown> } | { ok: false; error: string } {
   const trimmed = text.trim();
   if (trimmed === "") return { ok: true, value: {} };
   try {
