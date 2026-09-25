@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "key": "refund-window",
+      "input": {
+        "question": "How long do customers have to request a refund?",
+        "context": "[1] Refunds can be requested within 30 days of purchase.\n[2] Shipping fees are non-refundable.\n[3] Store credit never expires."
+      },
+      "expected": { "answer": "30 days" },
+      "tags": ["policy", "easy"]
+    },
+    {
+      "key": "shipping-fees",
+      "input": {
+        "question": "Are shipping fees refunded?",
+        "context": "[1] Refunds can be requested within 30 days of purchase.\n[2] Shipping fees are non-refundable.\n[3] Store credit never expires."
+      },
+      "expected": { "answer": "No, shipping fees are non-refundable" },
+      "tags": ["policy", "easy"]
+    },
+    {
+      "key": "store-credit-expiry",
+      "input": {
+        "question": "When does store credit expire?",
+        "context": "[1] Gift cards expire after five years.\n[2] Store credit never expires.\n[3] Promotional credit expires after 90 days."
+      },
+      "expected": { "answer": "Store credit never expires" },
+      "tags": ["policy", "hard", "distractor"],
+      "metadata": { "source": "synthetic" }
+    }
+  ]
+}
