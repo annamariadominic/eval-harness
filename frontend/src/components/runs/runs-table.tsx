@@ -1,8 +1,9 @@
 import Link from "next/link";
 
-import { Badge, RunStatusBadge } from "@/components/ui/badge";
+import { Badge, RecordedBadge, RunStatusBadge } from "@/components/ui/badge";
 import { RunProgressBar } from "@/components/ui/progress";
 import type { Run } from "@/lib/api/types";
+import { isRecordedRun } from "@/lib/demo";
 import { formatRelativeTime, formatScore } from "@/lib/format";
 
 type ArmSummary = { overall_score?: number | null; failed?: number };
@@ -42,6 +43,7 @@ export function RunsTable({ runs, showSuite }: { runs: Run[]; showSuite?: boolea
                     baseline
                   </Badge>
                 )}
+                {isRecordedRun(run) && <RecordedBadge className="ml-2" />}
               </td>
               {showSuite && (
                 <td className="px-4 py-3">

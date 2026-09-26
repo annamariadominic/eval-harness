@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { mutate } from "swr";
 
-import { Badge, RunStatusBadge } from "@/components/ui/badge";
+import { Badge, RecordedBadge, RunStatusBadge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { FormError, Select } from "@/components/ui/field";
@@ -14,6 +14,7 @@ import { RunProgressBar } from "@/components/ui/progress";
 import { api, errorMessage } from "@/lib/api/client";
 import { keys } from "@/lib/api/hooks";
 import { ACTIVE_RUN_STATUSES, type RunDetail } from "@/lib/api/types";
+import { isRecordedRun } from "@/lib/demo";
 import { formatDateTime, formatDuration } from "@/lib/format";
 
 export function RunHeader({ run }: { run: RunDetail }) {
@@ -73,6 +74,7 @@ export function RunHeader({ run }: { run: RunDetail }) {
             {run.name}
             <RunStatusBadge status={run.status} />
             {run.is_baseline && <Badge tone="accent">baseline</Badge>}
+            {isRecordedRun(run) && <RecordedBadge />}
           </span>
         }
         description={

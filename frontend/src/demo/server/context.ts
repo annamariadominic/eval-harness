@@ -17,7 +17,13 @@ export type ProviderInfo = {
   env_var: string | null;
 };
 
-export type Settings = { default_concurrency: number; max_concurrency: number };
+export type Settings = {
+  default_concurrency: number;
+  max_concurrency: number;
+  /** Demo-only limits that keep a visitor's browser tab responsive. */
+  max_import_cases: number;
+  max_generations: number;
+};
 
 export type Context = {
   db: Database;
@@ -28,7 +34,12 @@ export type Context = {
   settings: Settings;
 };
 
-export const DEFAULT_SETTINGS: Settings = { default_concurrency: 4, max_concurrency: 32 };
+export const DEFAULT_SETTINGS: Settings = {
+  default_concurrency: 4,
+  max_concurrency: 32,
+  max_import_cases: 500,
+  max_generations: 500,
+};
 
 const schemas = openapi.components.schemas as unknown as Record<string, Schema>;
 

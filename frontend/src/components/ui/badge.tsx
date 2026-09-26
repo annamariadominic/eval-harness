@@ -37,6 +37,15 @@ export function Badge({
   );
 }
 
+/** Marks a run whose results were recorded against real models before the demo was built. */
+export function RecordedBadge({ className }: { className?: string }) {
+  return (
+    <Badge className={className} title="Real-model results recorded in advance">
+      recorded
+    </Badge>
+  );
+}
+
 const RUN_STATUS_TONE: Record<string, Tone> = {
   queued: "neutral",
   running: "accent",
