@@ -18,6 +18,7 @@ evaluator, per slice of the dataset, alongside latency, token usage, and estimat
 - [The problem](#the-problem)
 - [Features](#features)
 - [Quick start](#quick-start)
+- [Portfolio demo](#portfolio-demo)
 - [Environment variables](#environment-variables)
 - [How an evaluation run works](#how-an-evaluation-run-works)
 - [Scoring, baselines, and regressions](#scoring-baselines-and-regressions)
@@ -130,6 +131,49 @@ uvicorn app.main:app --reload --port 8000
    ![Case inspector for the regressed norrland-fleet case: input and reference answer, both outputs side by side, and the Correctness judge's score and reason for each](docs/screenshots/case-inspector.png)
 
 7. **Set as baseline** on a run to make it the reference for future runs.
+
+## Portfolio demo
+
+The `demo` branch builds a version of the app that needs no server, no database, and no API
+keys, so it can be hosted for free (for example on Vercel's Hobby plan). Visitors can browse runs
+recorded in advance against real OpenAI and Anthropic models, and edit prompts, variants,
+evaluators, and data and launch their own runs against the mock provider.
+
+How it works:
+
+- **The backend runs in the browser.** With `NEXT_PUBLIC_DEMO_MODE=1`, the API client sends every
+  `/api/*` request to `frontend/src/demo/server` instead of the network. It is a TypeScript port
+  of the services, the runner, the mock provider, the evaluators, and the analysis, driven by the
+  same OpenAPI and evaluator schemas as the real API.
+- **Each visitor gets a private sandbox**, seeded from `frontend/public/demo/snapshot.json` and
+  saved in their own browser (IndexedDB). *Reset demo* restores the snapshot. Nothing is sent
+  anywhere, and runs left in progress when the page closes can be resumed.
+- **Python stays the source of truth.** `backend/app/demo/export.py` exports the snapshot plus
+  golden fixtures: every read endpoint's response, and input/output pairs for templates, pricing,
+  the mock, every evaluator, and the analysis. The TypeScript tests require identical results,
+  and replaying every seeded run through the in-browser runner must reproduce the Python outputs,
+  scores, costs, and retries exactly. The few unavoidable differences (JavaScript cannot tell
+  `3.0` from `3`, and regex/JSON Schema engine error wording) are documented in
+  `frontend/src/demo/engine/index.ts`.
+
+```bash
+# Run the demo locally (no backend needed)
+cd frontend && NEXT_PUBLIC_DEMO_MODE=1 npm run dev
+```
+
+```bash
+# Re-export the mock-only snapshot and golden fixtures (deterministic: unchanged code gives identical files)
+cd backend && uv run python -m app.demo.export
+```
+
+```bash
+# Record the real-model runs once, with keys in backend/.env; prints a cost estimate and asks first
+cd backend && uv run python -m app.demo.record
+```
+
+The runs to record are listed in `backend/app/demo/recordings.json`. An existing recording is never
+overwritten without `--force`; re-export it with `--export-only`. To deploy, point a Vercel project
+at the `frontend` directory with `demo` as the production branch and `NEXT_PUBLIC_DEMO_MODE=1`.
 
 ## Environment variables
 
