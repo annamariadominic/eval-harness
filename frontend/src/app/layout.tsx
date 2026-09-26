@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 
+import { DemoBanner } from "@/components/shell/demo-banner";
 import { Sidebar } from "@/components/shell/sidebar";
 import { THEME_INIT_SCRIPT } from "@/components/shell/theme-toggle";
 
@@ -37,7 +38,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <div className="flex min-h-screen flex-col md:flex-row">
           <Sidebar />
           <main className="min-w-0 flex-1 px-4 py-6 md:px-8 md:py-8">
-            <div className="mx-auto max-w-[1280px]">{children}</div>
+            <div className="mx-auto max-w-[1280px]">
+              <DemoBanner />
+              {children}
+            </div>
           </main>
         </div>
       </body>
