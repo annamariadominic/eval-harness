@@ -22,6 +22,7 @@ from app.analysis.slices import compute_slices
 from app.config import Settings
 from app.db.models import Run, RunVariant, Suite
 from app.db.session import Database
+from app.demo.compat_cases import compat_cases
 from app.domain.templates import TemplateError, render_template, template_variables
 from app.evaluators.base import EvaluationSample, EvaluatorError, ModelCall
 from app.evaluators.judge import JUDGE_SYSTEM_PROMPT, LLMJudgeConfig, build_judge_prompt
@@ -876,6 +877,7 @@ async def unit_golden(db: Database, tables: Tables, pricing_file: Path) -> dict[
     pricing = PricingTable.from_file(pricing_file)
     evaluators, judge_requests = await _evaluator_cases(tables, pricing)
     return {
+        "python": compat_cases(),
         "templates": _template_cases(),
         "pricing": _pricing_cases(pricing),
         "mock": await _mock_cases(judge_requests),
