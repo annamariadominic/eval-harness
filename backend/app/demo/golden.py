@@ -26,7 +26,12 @@ from app.demo.compat_cases import compat_cases
 from app.domain.templates import TemplateError, render_template, template_variables
 from app.evaluators.base import EvaluationSample, EvaluatorError, ModelCall
 from app.evaluators.judge import JUDGE_SYSTEM_PROMPT, LLMJudgeConfig, build_judge_prompt
-from app.evaluators.registry import InvalidEvaluatorConfig, build_evaluator, parse_config
+from app.evaluators.registry import (
+    InvalidEvaluatorConfig,
+    build_evaluator,
+    normalize_config,
+    parse_config,
+)
 from app.main import create_app
 from app.pricing import PricingTable
 from app.providers.mock import MockProvider
@@ -581,6 +586,43 @@ EDGE_EVALUATOR_CASES: list[dict[str, Any]] = [
     {"type": "field_match", "config": {}, "input": "q", "expected": {"a": 1}, "output": "x"},
 ]
 
+RICH_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "company": {"type": "string", "minLength": 1},
+        "revenue": {"type": "integer", "minimum": 0},
+        "year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+        "tags": {"type": "array", "items": {"type": "string"}, "maxItems": 1},
+        "kind": {"enum": ["a", "b"]},
+        "c": {"const": 3},
+        "p": {"type": "string", "pattern": "^x"},
+        "n": {"type": ["number", "null"]},
+        "s": {"type": "string", "minLength": 3, "maxLength": 4},
+    },
+    "required": ["company", "revenue", "year"],
+    "additionalProperties": False,
+}
+RICH_SCHEMA_OUTPUTS = [
+    '{"company": "", "revenue": "$4.2 billion", "year": 1800, "x": 1, "y": 2}',
+    '{"company": 1, "revenue": 4.5, "year": 2200, "tags": ["a", 2], "kind": "z", "c": 4, '
+    '"p": "y", "n": "q", "s": "ab"}',
+    "[]",
+    '"str"',
+    '{"s": "abcdef", "revenue": -1}',
+    '{"company": "Acme", "revenue": 5, "year": 2000, "extra": true}',
+    '{"company": "Acme", "revenue": 5, "year": 2000}',
+]
+EDGE_EVALUATOR_CASES += [
+    {
+        "type": "json_schema",
+        "config": {"json_schema": RICH_SCHEMA},
+        "input": "q",
+        "expected": None,
+        "output": output,
+    }
+    for output in RICH_SCHEMA_OUTPUTS
+]
+
 INVALID_CONFIGS: list[dict[str, Any]] = [
     {"type": "nope", "config": {}},
     {"type": "regex", "config": {}},
@@ -590,6 +632,17 @@ INVALID_CONFIGS: list[dict[str, Any]] = [
     {"type": "field_match", "config": {"numeric_tolerance": -1}},
     {"type": "json_schema", "config": {"json_schema": {"type": "nonsense"}}},
     {"type": "exact_match", "config": {"unknown": True}},
+    {"type": "exact_match", "config": {"case_sensitive": "maybe", "expected_path": 3}},
+    {"type": "contains", "config": {"values": "abc"}},
+    {"type": "contains", "config": {"values": ["a", 2]}},
+    {"type": "field_match", "config": {"pass_threshold": 1.5, "numeric_tolerance": "x"}},
+    {"type": "llm_judge", "config": {"criteria": "c"}},
+    {
+        "type": "llm_judge",
+        "config": {"provider": "mock", "model": "m", "criteria": "c", "max_tokens": 10},
+    },
+    {"type": "json_schema", "config": {}},
+    {"type": "json_schema", "config": {"json_schema": []}},
     {"type": "llm_judge", "config": {"provider": "mock", "model": "m", "criteria": ""}},
     {
         "type": "llm_judge",
@@ -633,6 +686,7 @@ async def _evaluate_case(case: dict[str, Any], caller: _RecordingCaller) -> dict
     sample = EvaluationSample(input=case["input"], expected=case["expected"], output=case["output"])
     try:
         evaluator = build_evaluator(case["type"], case["config"], caller)
+        entry["normalized"] = normalize_config(case["type"], case["config"])
         entry["outcome"] = _outcome_dict(await evaluator.evaluate(sample))
     except EvaluatorError as exc:
         entry["error"] = str(exc)

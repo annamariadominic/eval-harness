@@ -47,9 +47,12 @@ async def dump_tables(db: Database) -> dict[str, list[dict[str, Any]]]:
     return tables
 
 
-def build_snapshot(tables: dict[str, list[dict[str, Any]]], pricing_file: Path) -> dict[str, Any]:
+def build_snapshot(
+    tables: dict[str, list[dict[str, Any]]], pricing_file: Path, meta: dict[str, Any]
+) -> dict[str, Any]:
+    """``meta`` holds static API responses the demo serves as-is (providers, evaluator types)."""
     pricing = json.loads(pricing_file.read_text()) if pricing_file.exists() else {"models": []}
-    body = {"tables": tables, "pricing": pricing}
+    body = {"tables": tables, "pricing": pricing, "meta": meta}
     digest = hashlib.sha256(
         json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()

@@ -68,11 +68,17 @@ async def export(db_path: Path, frontend_root: Path, pricing_file: Path) -> dict
     db = Database(url)
     try:
         tables = await dump_tables(db)
-        snapshot = build_snapshot(tables, pricing_file)
         api = await api_golden(keyless_settings(url, pricing_file), tables)
         unit = await unit_golden(db, tables, pricing_file)
     finally:
         await db.dispose()
+
+    responses = {entry["path"]: entry["body"] for entry in api}
+    meta = {
+        "providers": responses["/providers"],
+        "evaluator_types": responses["/evaluator-types"],
+    }
+    snapshot = build_snapshot(tables, pricing_file, meta)
 
     outputs = {
         frontend_root / SNAPSHOT_PATH: _dumps(snapshot),
