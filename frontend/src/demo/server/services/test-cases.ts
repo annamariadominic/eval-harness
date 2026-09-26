@@ -207,6 +207,11 @@ export function importTestCases(ctx: Context, suiteId: string, body: unknown) {
   const mode = value.mode as "append" | "replace";
   const dryRun = value.dry_run as boolean;
   if (cases.length === 0) throw new InvalidRequestError("The import contains no test cases");
+  if (cases.length > ctx.settings.max_import_cases) {
+    throw new InvalidRequestError(
+      `The demo imports at most ${ctx.settings.max_import_cases} test cases at a time`,
+    );
+  }
 
   const existing = ctx.db.where("test_cases", "suite_id", suiteId);
   const existingKeys =

@@ -185,6 +185,13 @@ export function createRun(ctx: Context, suiteId: string, body: unknown) {
     cases = cases.filter((c) => (c.tags as string[]).some((t) => tags.includes(t)));
   }
   if (cases.length === 0) throw new InvalidRequestError("The selection contains no test cases");
+  const generations = cases.length * variants.length;
+  if (generations > ctx.settings.max_generations) {
+    throw new InvalidRequestError(
+      `The demo runs at most ${ctx.settings.max_generations} generations at a time ` +
+        `(this selection needs ${generations}); choose fewer cases or variants`,
+    );
+  }
 
   for (const variant of variants)
     requireProvider(ctx, variant.provider as string, `Variant '${variant.name}'`);

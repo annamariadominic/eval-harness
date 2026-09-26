@@ -293,6 +293,24 @@ describe("editing a suite end to end", () => {
   });
 });
 
+describe("demo limits", () => {
+  it("caps imports and run sizes so a tab stays responsive", async () => {
+    const server = await start();
+    server.ctx.settings = { ...server.ctx.settings, max_import_cases: 2, max_generations: 3 };
+    const suite = snapshot.tables.eval_suites[0];
+    const tooMany = await call(server, "POST", `/suites/${suite.id}/test-cases/import`, {
+      cases: [{ input: "a" }, { input: "b" }, { input: "c" }],
+      dry_run: true,
+    });
+    expect(tooMany.body.error.message).toBe("The demo imports at most 2 test cases at a time");
+    const variant = snapshot.tables.variants.find((v) => v.suite_id === suite.id)!;
+    const big = await call(server, "POST", `/suites/${suite.id}/runs`, {
+      variant_ids: [variant.id],
+    });
+    expect(big.body.error.message).toMatch(/^The demo runs at most 3 generations at a time/);
+  });
+});
+
 describe("cancel and resume", () => {
   it("cancels mid-run without committing partial items, then resumes to completion", async () => {
     let release: () => void = () => {};
