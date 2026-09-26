@@ -1,0 +1,116 @@
+{
+  "description": "Real-model runs recorded once, locally, for the portfolio demo. Variants and evaluators listed here are added to the seeded example suites; runs reference variants and evaluators by name (new or seeded). Check model ids against each provider's current model list and backend/pricing.json before recording.",
+  "suites": [
+    {
+      "suite": "Research QA",
+      "variants": [
+        {
+          "name": "GPT-5 mini · prompt v1",
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "system_prompt": "You are a helpful research assistant. Answer the user's question.",
+          "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+          "max_tokens": 2048,
+          "settings": { "reasoning_effort": "low" }
+        },
+        {
+          "name": "GPT-5 mini · prompt v2",
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "system_prompt": "You are a research assistant. Answer using only the context provided. Be concise. Cite the passage you relied on as [n].",
+          "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+          "max_tokens": 2048,
+          "settings": { "reasoning_effort": "low" }
+        },
+        {
+          "name": "Claude Haiku 4.5 · prompt v2",
+          "provider": "anthropic",
+          "model": "claude-haiku-4-5",
+          "system_prompt": "You are a research assistant. Answer using only the context provided. Be concise. Cite the passage you relied on as [n].",
+          "user_template": "Question: {{ question }}\n\nContext:\n{{ context }}",
+          "max_tokens": 512
+        }
+      ],
+      "evaluators": [
+        {
+          "name": "Correctness · Claude judge",
+          "type": "llm_judge",
+          "regression_threshold": 0.1,
+          "config": {
+            "provider": "anthropic",
+            "model": "claude-sonnet-5",
+            "criteria": "Does the response state the same facts as the reference answer? Penalise missing, incorrect, or conflicting figures, dates, and names. Extra correct detail is fine.",
+            "score_min": 1,
+            "score_max": 5,
+            "pass_threshold": 0.75
+          }
+        },
+        {
+          "name": "Faithfulness · Claude judge",
+          "type": "llm_judge",
+          "regression_threshold": 0.1,
+          "config": {
+            "provider": "anthropic",
+            "model": "claude-sonnet-5",
+            "criteria": "Is every claim in the response supported by the provided context? Penalise speculation, outside knowledge, and hallucinated details, even when they sound plausible.",
+            "score_min": 0,
+            "score_max": 1,
+            "pass_threshold": 0.8,
+            "include_expected": false
+          }
+        }
+      ],
+      "runs": [
+        {
+          "name": "Real models · recorded",
+          "variants": [
+            "GPT-5 mini · prompt v1",
+            "GPT-5 mini · prompt v2",
+            "Claude Haiku 4.5 · prompt v2",
+            "Claude Sonnet 5 · prompt v2"
+          ],
+          "evaluators": ["Correctness · Claude judge", "Faithfulness · Claude judge", "Cites a passage"]
+        }
+      ]
+    },
+    {
+      "suite": "Structured Extraction",
+      "variants": [
+        {
+          "name": "GPT-5 mini · free-form",
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "system_prompt": "Extract the company name, annual revenue, and fiscal year from the document as JSON.",
+          "user_template": "{{ input }}",
+          "max_tokens": 2048,
+          "settings": { "reasoning_effort": "low" }
+        },
+        {
+          "name": "GPT-5 mini · strict JSON",
+          "provider": "openai",
+          "model": "gpt-5-mini",
+          "system_prompt": "Return only JSON with exactly these keys: company (string), revenue (integer, the full number in USD), year (integer fiscal year). No prose, no markdown.",
+          "user_template": "Document:\n{{ input }}",
+          "max_tokens": 2048,
+          "settings": { "reasoning_effort": "low" }
+        },
+        {
+          "name": "Claude Haiku 4.5 · strict JSON",
+          "provider": "anthropic",
+          "model": "claude-haiku-4-5",
+          "system_prompt": "Return only JSON with exactly these keys: company (string), revenue (integer, the full number in USD), year (integer fiscal year). No prose, no markdown.",
+          "user_template": "Document:\n{{ input }}",
+          "max_tokens": 256
+        }
+      ],
+      "evaluators": [],
+      "runs": [
+        {
+          "name": "Real models · recorded",
+          "variants": ["GPT-5 mini · free-form", "GPT-5 mini · strict JSON", "Claude Haiku 4.5 · strict JSON"],
+          "evaluators": ["Valid JSON", "Schema compliance", "Required fields", "Field accuracy"]
+        }
+      ]
+    }
+  ]
+}
