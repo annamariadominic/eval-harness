@@ -22,6 +22,7 @@ import {
 } from "@/lib/api/hooks";
 import type { RunDetail } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
+import { unavailableHint, unavailableLabel } from "@/lib/demo";
 import { describeEvaluator } from "@/lib/evaluator-forms";
 import { planRun } from "@/lib/run-plan";
 
@@ -132,7 +133,11 @@ export default function NewRunPage() {
                         {variant.name}
                       </span>
                       <span className="font-mono text-xs text-muted">{variant.model}</span>
-                      {!ok && <Badge tone="warn">set {provider?.env_var}</Badge>}
+                      {!ok && (
+                        <Badge tone="warn" title={unavailableHint(provider?.env_var)}>
+                          {unavailableLabel(provider?.env_var)}
+                        </Badge>
+                      )}
                     </label>
                   </li>
                 );
@@ -151,6 +156,7 @@ export default function NewRunPage() {
               {evaluators.map((evaluator) => {
                 const ok =
                   evaluator.type !== "llm_judge" || runnable(judgeProvider(evaluator.config));
+                const judge = providers.find((p) => p.name === judgeProvider(evaluator.config));
                 return (
                   <li key={evaluator.id}>
                     <label
@@ -172,6 +178,11 @@ export default function NewRunPage() {
                       <span className="min-w-0 flex-1 truncate text-xs text-muted">
                         {describeEvaluator(evaluator.type, evaluator.config)}
                       </span>
+                      {!ok && (
+                        <Badge tone="warn" title={unavailableHint(judge?.env_var)}>
+                          {unavailableLabel(judge?.env_var)}
+                        </Badge>
+                      )}
                     </label>
                   </li>
                 );

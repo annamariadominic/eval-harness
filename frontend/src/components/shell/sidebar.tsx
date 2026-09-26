@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import { useProviders } from "@/lib/api/hooks";
 import { cn } from "@/lib/cn";
+import { unavailableHint } from "@/lib/demo";
 
 import { ThemeToggle } from "./theme-toggle";
 
@@ -54,11 +55,7 @@ export function Sidebar() {
               <li
                 key={provider.name}
                 className="flex items-center justify-between text-xs"
-                title={
-                  provider.configured
-                    ? "Configured"
-                    : `Set ${provider.env_var ?? "an API key"} to enable`
-                }
+                title={provider.configured ? "Configured" : unavailableHint(provider.env_var)}
               >
                 <span className={provider.configured ? "text-ink" : "text-faint"}>
                   {provider.label}
