@@ -19,6 +19,7 @@ from typing import Any
 
 from app.config import BACKEND_ROOT, Settings
 from app.db.session import Database
+from app.demo.deterministic import deterministic_ids_and_clock
 from app.demo.golden import api_golden, keyless_settings, unit_golden
 from app.demo.snapshot import build_snapshot, dump_tables
 from app.main import create_app
@@ -53,11 +54,13 @@ def _dumps(payload: Any) -> str:
 
 
 async def seed_fresh_database(path: Path, pricing_file: Path) -> None:
+    """Seed the example suites with reproducible identifiers, timestamps, and item order."""
     settings = keyless_settings(f"sqlite+aiosqlite:///{path}", pricing_file)
-    settings = settings.model_copy(update={"seed_examples": True})
+    settings = settings.model_copy(update={"seed_examples": True, "default_concurrency": 1})
     app = create_app(settings)
-    async with app.router.lifespan_context(app):
-        pass
+    with deterministic_ids_and_clock():
+        async with app.router.lifespan_context(app):
+            pass
 
 
 async def export(db_path: Path, frontend_root: Path, pricing_file: Path) -> dict[str, Path]:
@@ -65,11 +68,17 @@ async def export(db_path: Path, frontend_root: Path, pricing_file: Path) -> dict
     db = Database(url)
     try:
         tables = await dump_tables(db)
-        snapshot = build_snapshot(tables, pricing_file)
         api = await api_golden(keyless_settings(url, pricing_file), tables)
         unit = await unit_golden(db, tables, pricing_file)
     finally:
         await db.dispose()
+
+    responses = {entry["path"]: entry["body"] for entry in api}
+    meta = {
+        "providers": responses["/providers"],
+        "evaluator_types": responses["/evaluator-types"],
+    }
+    snapshot = build_snapshot(tables, pricing_file, meta)
 
     outputs = {
         frontend_root / SNAPSHOT_PATH: _dumps(snapshot),
