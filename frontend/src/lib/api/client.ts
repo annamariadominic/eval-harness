@@ -14,12 +14,27 @@ export class ApiError extends Error {
 
 type ErrorEnvelope = { error?: { code?: string; message?: string; details?: unknown } };
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const response = await fetch(`/api${path}`, {
+async function send(method: string, path: string, body?: unknown): Promise<Response> {
+  // Demo builds answer every API call from an in-browser backend instead of the network. The
+  // flag is inlined at build time; other builds never load the demo code (a separate lazy chunk).
+  if (process.env.NEXT_PUBLIC_DEMO_MODE === "1") {
+    const { demoFetch } = await import("@/demo/server");
+    // Round-trip through JSON so the demo sees exactly what the network would carry.
+    return demoFetch(
+      method,
+      path,
+      body === undefined ? undefined : JSON.parse(JSON.stringify(body)),
+    );
+  }
+  return fetch(`/api${path}`, {
     method,
     headers: body === undefined ? undefined : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+}
+
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  const response = await send(method, path, body);
   if (response.status === 204) return undefined as T;
   const payload: unknown = await response.json().catch(() => null);
   if (!response.ok) {
